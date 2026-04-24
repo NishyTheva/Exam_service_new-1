@@ -31,4 +31,4 @@ jobs:
 
       - name: Restart AWS ECS Service
         run: |
-          aws ecs update-service --cluster exam-service-cluster --service exam-service-task --force-new-deployment
+          aws ecs update-service --cluster exam-service-cluster --service exam-service-service-sw5ex0fi --force-new-deployment
