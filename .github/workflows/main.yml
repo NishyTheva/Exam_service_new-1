@@ -19,8 +19,8 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker build -t varanankb/exam-service:latest .
-          docker push varanankb/exam-service:latest
+          docker build -t nishtheva/exam-service:latest .
+          docker push nishtheva/exam-service:latest
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
