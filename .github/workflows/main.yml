@@ -31,10 +31,4 @@ jobs:
 
       - name: Restart AWS ECS Service
         run: |
-          # MUKKIYAM: Keela irukura --service pakkathula unga friend-oda 
-          # AWS Service name-a mattum check panni poda sollunga.
-          aws ecs update-service \
-            --cluster exam-service-cluster \
-            --service exam-service-service-sw5ex0fi \
-            --force-new-deployment \
-            --region eu-north-1
+          aws ecs update-service --cluster exam-service-cluster --service exam-service-service-sw5ex0fi --force-new-deployment --region eu-north-1
