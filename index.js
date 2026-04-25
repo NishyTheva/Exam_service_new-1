@@ -20,10 +20,12 @@ const swaggerOptions = {
     },
     servers: [
       {
-        // FIX 1: Localhost-a remove pannitu '/' nu mathiruken. 
-        // Ippo ithu automatic-ah AWS-oda Public IP-a eduthukum.
-        url: '/', 
-        description: 'Current server',
+        url: '/',
+        description: 'Current host (browser origin — same as Swagger page)',
+      },
+      {
+        url: `http://localhost:${PORT}`,
+        description: 'Local (explicit URL)',
       },
     ],
     components: {
@@ -69,9 +71,8 @@ mongoose
   .connect(MONGO_URI)
   .then(() => {
     console.log('MongoDB connected');
-    // FIX 2: AWS Docker-kaaga '0.0.0.0' add panniruken.
     app.listen(PORT, '0.0.0.0', () => {
-      console.log(`Server listening on port ${PORT}`);
+      console.log(`Server listening on http://0.0.0.0:${PORT}`);
     });
   })
   .catch((err) => {
