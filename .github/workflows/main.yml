@@ -27,8 +27,14 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+          aws-region: eu-north-1  # <--- FIX: us-east-1 la irunthu Stockholm-ku mathiyaachu
 
       - name: Restart AWS ECS Service
         run: |
-          aws ecs update-service --cluster exam-service-cluster --service exam-service-task --force-new-deployment
+          # MUKKIYAM: Keela irukura --service pakkathula unga friend-oda 
+          # AWS Service name-a mattum check panni poda sollunga.
+          aws ecs update-service \
+            --cluster exam-service-cluster \
+            --service exam-service-service-sw5ex0fi \
+            --force-new-deployment \
+            --region eu-north-1
