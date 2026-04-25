@@ -16,13 +16,14 @@ const swaggerOptions = {
     info: {
       title: 'Exam Microservice API',
       version: '1.0.0',
-      description:
-        'RESTful API for exams. Validates students and teachers via the Student and Teacher microservices; exposes data for student-level aggregation.',
+      description: 'RESTful API for exams.',
     },
     servers: [
       {
-        url: `http://localhost:${PORT}`,
-        description: 'Local server',
+        // FIX 1: Localhost-a remove pannitu '/' nu mathiruken. 
+        // Ippo ithu automatic-ah AWS-oda Public IP-a eduthukum.
+        url: '/', 
+        description: 'Current server',
       },
     ],
     components: {
@@ -39,12 +40,6 @@ const swaggerOptions = {
             examDate: { type: 'string', format: 'date-time' },
             maxScore: { type: 'number', example: 100 },
             score: { type: 'number', example: 85 },
-          },
-        },
-        Error: {
-          type: 'object',
-          properties: {
-            message: { type: 'string' },
           },
         },
       },
@@ -74,9 +69,9 @@ mongoose
   .connect(MONGO_URI)
   .then(() => {
     console.log('MongoDB connected');
-    app.listen(PORT, () => {
+    // FIX 2: AWS Docker-kaaga '0.0.0.0' add panniruken.
+    app.listen(PORT, '0.0.0.0', () => {
       console.log(`Server listening on port ${PORT}`);
-      console.log(`Swagger UI available at http://localhost:${PORT}/api-docs`);
     });
   })
   .catch((err) => {
