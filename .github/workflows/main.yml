@@ -1,34 +1,85 @@
-name: CI/CD Pipeline to AWS ECS (Exam)
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const mongoose = require('mongoose');
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
+const examRoutes = require('./routes/examRoutes');
 
-on:
-  push:
-    branches: ['main', 'master']
+const app = express();
+const PORT = process.env.PORT || 5001;
+const MONGO_URI = process.env.MONGO_URI;
 
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Source Code
-        uses: actions/checkout@v3
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Exam Microservice API',
+      version: '1.0.0',
+      description:
+        'RESTful API for exams. Validates students and teachers via the Student and Teacher microservices; exposes data for student-level aggregation.',
+    },
+    servers: [
+      {
+        url: `http://localhost:${PORT}`,
+        description: 'Local server',
+      },
+    ],
+    components: {
+      schemas: {
+        Exam: {
+          type: 'object',
+          required: ['examId', 'title', 'studentId'],
+          properties: {
+            examId: { type: 'string', example: 'E001' },
+            title: { type: 'string', example: 'Midterm — Software Architecture' },
+            courseCode: { type: 'string', example: 'IT4130' },
+            studentId: { type: 'string', example: 'S001' },
+            teacherId: { type: 'string', example: 'T001' },
+            examDate: { type: 'string', format: 'date-time' },
+            maxScore: { type: 'number', example: 100 },
+            score: { type: 'number', example: 85 },
+          },
+        },
+        Error: {
+          type: 'object',
+          properties: {
+            message: { type: 'string' },
+          },
+        },
+      },
+    },
+  },
+  apis: ['./routes/examRoutes.js'],
+};
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-      - name: Build and Push Docker Image
-        run: |
-          docker build -t nishtheva/exam-service:latest .
-          docker push nishtheva/exam-service:latest
+app.use(cors());
+app.use(express.json());
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-north-1
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'Exam Service is running' });
+});
 
-      - name: Restart AWS ECS Service
-        run: |
-          aws ecs update-service --cluster exam-service-cluster --service exam-service-service-sw5ex0fi --force-new-deployment --region eu-north-1
+app.use('/api/exams', examRoutes);
+
+if (!MONGO_URI) {
+  console.error('Missing MONGO_URI in environment');
+  process.exit(1);
+}
+
+mongoose
+  .connect(MONGO_URI)
+  .then(() => {
+    console.log('MongoDB connected');
+    app.listen(PORT, () => {
+      console.log(`Server listening on port ${PORT}`);
+      console.log(`Swagger UI available at http://localhost:${PORT}/api-docs`);
+    });
+  })
+  .catch((err) => {
+    console.error('MongoDB connection error:', err.message);
+    process.exit(1);
+  });
