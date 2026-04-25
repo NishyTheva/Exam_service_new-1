@@ -7,7 +7,7 @@ const swaggerJsdoc = require('swagger-jsdoc');
 const examRoutes = require('./routes/examRoutes');
 
 const app = express();
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5010;
 const MONGO_URI = process.env.MONGO_URI;
 
 const swaggerOptions = {
