@@ -10,6 +10,9 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 const MONGO_URI = process.env.MONGO_URI;
 
+app.use(cors());
+app.use(express.json());
+
 const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
@@ -21,8 +24,16 @@ const swaggerOptions = {
     },
     servers: [
       {
+        url: '/',
+        description: 'Same origin as this page (fixes localhost vs 127.0.0.1 in Try it out)',
+      },
+      {
+        url: `http://127.0.0.1:${PORT}`,
+        description: 'Loopback explicit',
+      },
+      {
         url: `http://localhost:${PORT}`,
-        description: 'Local server',
+        description: 'Localhost explicit',
       },
     ],
     components: {
@@ -55,9 +66,6 @@ const swaggerOptions = {
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
-app.use(cors());
-app.use(express.json());
 
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'Exam Service is running' });

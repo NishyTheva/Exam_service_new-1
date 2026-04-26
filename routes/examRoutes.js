@@ -34,16 +34,20 @@ const {
  *         description: Exam created
  *       400:
  *         description: Validation or referenced entity not found
- */
-router.post('/', createExam);
-
-/**
- * @swagger
- * /api/exams:
  *   get:
  *     summary: List all exams
  *     tags: [Exams]
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Exam'
  */
+router.post('/', createExam);
 router.get('/', getAllExams);
 
 /**
@@ -52,6 +56,16 @@ router.get('/', getAllExams);
  *   get:
  *     summary: Exams for a student (used by Student microservice aggregation)
  *     tags: [Exams]
+ *     parameters:
+ *       - in: path
+ *         name: studentId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: S001
+ *     responses:
+ *       200:
+ *         description: OK
  */
 router.get('/student/:studentId', getExamsByStudentId);
 
@@ -61,6 +75,19 @@ router.get('/student/:studentId', getExamsByStudentId);
  *   get:
  *     summary: Exam plus student and teacher data from other microservices
  *     tags: [Exams]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: MongoDB _id or business examId
+ *         example: E001
+ *     responses:
+ *       200:
+ *         description: OK
+ *       404:
+ *         description: Exam not found
  */
 router.get('/:id/with-participants', getExamWithParticipants);
 
@@ -70,25 +97,57 @@ router.get('/:id/with-participants', getExamWithParticipants);
  *   get:
  *     summary: Get one exam by MongoDB _id or examId
  *     tags: [Exams]
- */
-router.get('/:id', getExamById);
-
-/**
- * @swagger
- * /api/exams/{id}:
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: E001
+ *     responses:
+ *       200:
+ *         description: OK
+ *       404:
+ *         description: Exam not found
  *   put:
  *     summary: Update an exam
  *     tags: [Exams]
- */
-router.put('/:id', updateExam);
-
-/**
- * @swagger
- * /api/exams/{id}:
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: E001
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Exam'
+ *     responses:
+ *       200:
+ *         description: Updated
+ *       404:
+ *         description: Exam not found
  *   delete:
  *     summary: Delete an exam
  *     tags: [Exams]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: E001
+ *     responses:
+ *       200:
+ *         description: Deleted
+ *       404:
+ *         description: Exam not found
  */
+router.get('/:id', getExamById);
+router.put('/:id', updateExam);
 router.delete('/:id', deleteExam);
 
 module.exports = router;
